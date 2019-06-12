@@ -1,9 +1,16 @@
 const http = require('http');
-var argv = require('minimist')(process.argv.slice(2));
+const argv = require('minimist')(process.argv.slice(2));
 
 const config = {
   timeout: argv.t || 5,
   delta: argv.d || 1,
+}
+
+let isRunning = false;
+
+if (config.timeout < config.delta) {
+  console.log('Delta time should be greater than timeout value.');
+  process.exit(1);
 }
 
 const currentTime = () => {
@@ -17,7 +24,19 @@ const renderDate = (res) => {
   });
   res.write(`Current time: ${currentTime()}`);
   res.end();
+  isRunning = false;
+  console.log('Sent content to client.');
 };
+
+const delay = () => {
+  setTimeout(() => {
+    if (!isRunning) {
+      return;
+    }
+    console.log(currentTime());
+    delay();
+  }, config.delta * 1000);
+}
 
 console.log(`Starting server with timeout: ${config.timeout}s, delta: ${config.delta}s. 
   Usage:
@@ -25,5 +44,8 @@ console.log(`Starting server with timeout: ${config.timeout}s, delta: ${config.d
   -d: delta time for time output`);
 
 http.createServer(function(req, res) {
-  renderDate(res);
+  console.log('Client sent request.');
+  isRunning = true;
+  setTimeout(renderDate.bind(this, res), config.timeout * 1000);
+  delay();
 }).listen(8080);
