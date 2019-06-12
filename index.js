@@ -9,7 +9,7 @@ const config = {
 let isRunning = false;
 
 if (config.timeout < config.delta) {
-  console.log('Delta time should be greater than timeout value.');
+  console.log('Timeout value should be greater than delta time.');
   process.exit(1);
 }
 
@@ -19,11 +19,12 @@ const currentTime = () => {
 }
 
 const renderDate = (res) => {
-  res.writeHead(404, {
+  res.writeHead(200, {
       'Content-Type': 'text/plain; charset=utf-8'
   });
   res.write(`Current time: ${currentTime()}`);
   res.end();
+  
   isRunning = false;
   console.log('Sent content to client.');
 };
