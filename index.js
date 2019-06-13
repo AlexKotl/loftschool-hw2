@@ -2,14 +2,14 @@ const http = require('http');
 const argv = require('minimist')(process.argv.slice(2));
 
 const config = {
-  timeout: argv.t || 5,
-  delta: argv.d || 1
+  timeout: Number(process.env.LOFT_SERVER_TIMEOUT) || 5,
+  delta: Number(process.env.LOFT_SERVER_DELTA) || 1
 };
 
 let isRunning = false;
 
 if (config.timeout < config.delta) {
-  console.log('Timeout value should be greater than delta time.');
+  console.log(`Timeout value should be greater than delta time.`);
   process.exit(1);
 }
 
@@ -39,10 +39,7 @@ const delay = () => {
   }, config.delta * 1000);
 };
 
-console.log(`Starting server with timeout: ${config.timeout}s, delta: ${config.delta}s. 
-  Usage:
-  -t: set timeout for request
-  -d: delta time for time output`);
+console.log(`Starting server with LOFT_SERVER_TIMEOUT: ${config.timeout}s, LOFT_SERVER_DELTA: ${config.delta}s.`);
 
 http.createServer(function (req, res) {
   console.log('Client sent request.');
